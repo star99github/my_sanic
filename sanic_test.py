@@ -79,3 +79,4 @@ if __name__ == "__main__":
     sanic_app.run(host="0.0.0.0", port=8005, workers=2, debug=True, auto_reload=True)
 
     print("-----> my_sanic 服务运行完成")
+    print("-----> my_sanic 服务运行完成")

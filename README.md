@@ -1,0 +1,2 @@
+# my_sanic
+my_sanic是个人用于学习sanic框架而开发的一个项目，主要用于练习使用sanic框架开发web应用

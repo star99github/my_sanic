@@ -1,0 +1,4 @@
+# 上传git时忽略的文件
+.git
+*logs
+*.tar

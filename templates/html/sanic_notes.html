@@ -1,0 +1,217 @@
+<html>
+<header>
+<meta charset="GBK">
+<div>
+    this is sheader
+</div>
+</header>
+<body>
+
+<div>
+
+<textarea>
+
+Sanic简介:
+    Sanic 是一个 Python 3.6+ web 服务器和web框架,使用python3.5+的async/await语法,实现异步非阻塞式的编程方式,
+    具有高性能,使用方便,扩展灵活.Sanic跟 flask 很像,但它编写的服务性能大概是flask的1.5倍。
+
+由于Sanic的异步性,在框架中使用各种第三方库时,尽量也采用支持异步的对应三方库,以发挥其异步编程的优势.
+如数据库连接用 aiomysql 代替 pymysql,其它类似. pip install aiomysql
+
+sanic支持websocket编程：from sanic.websocket import WebSocketProtocol，Sanic支持websocket版本7和8。
+    WebSocket是一种在单个TCP连接上进行全双工通信的协议，WebSocket API 也是W3C的标准之一；
+    websocket 可以使服务端和客户端的数据交换变得更加简单,允许服务端主动向客户端推送数据.
+    在WebSocket API中，浏览器和服务器只需要完成一次握手，两者之间就直接可以创建持久性的连接，并进行双向数据传输。
+    先启动服务端，后运行客户端。
+    服务端按先入先出处理事务，但asyncio的task的创建和 run执行不一定是按创建的顺序依次执行。
+
+Sanic安装: pip install sanic,
+查看安装: pip show sanic
+
+</textarea>
+
+<textarea>
+Sanic的请求方法:
+同常规的HTTP请求方法一致,主要有:
+get: 查询
+post: 新增
+delete: 删除
+put: 全局更新
+patch: 局部更新
+
+
+Sanic的请求对象 request:
+sanic的服务端接收请求过来的数据，通过request.属性 进行获取,部分属性获取方式如下:
+@app.post("/get_request")
+async def hello(request):
+    print("body:{}".format(request.json))
+    print("param:{}".format(request.args))
+    print("host:{}".format(request.host))
+    print("version:{}".format(request.version))
+    print("name:{}".format(request.name))
+    print("ip:{}".format(request.ip))
+    print("cookies:{}".format(request.cookies))
+    print("server_path:{}".format(request.server_path))
+    print("server_port:{}".format(request.server_port))
+    print("url:{}".format(request.url))
+    print("token:{}".format(request.token))
+    print("uri_template:{}".format(request.uri_template))
+    print(request.cookie.get(key))  # 获取请求cookie
+    return json({"hello": "post"})
+
+</textarea>
+
+<textarea>
+Sanic的响应对象 response:
+在sanic中使用函数 sanic.response 创建响应对象,主要类型有如下,其中使用比较多的有：text、json、html
+text:
+html:
+json:
+file:
+stream:
+file_stream:
+redirect: 主要实现重定向
+raw:
+empty: 204 - 请求成功了，但是没有结果返回
+
+
+修改sanic响应体的方法:
+return response.json(
+        {'message': '这是请求返回信息: response content!'},
+        headers={'X-Served-By': 'sanic', "severVersion": "v1.0.1"},
+        status=200
+    )
+
+可以在响应对象中设置或删除 cookie 信息，
+    cookie设置方式：response.cookies['key'] = str(key)  # 设置cookie
+    cookie删除方式： del response.cookies[key]
+    cookie可以设置为字典值，并具有以下可用参数：
+        expires （日期时间）：客户端浏览器上的cookie过期时间。
+        path （字符串）：应用此cookie的URL的子集。默认值为
+        comment （字符串）：注释（元数据）。
+        domain （字符串）：指定cookie有效的域。显式指定的域必须始终以点开头。
+        max-age （number）：cookie应生存的秒数。
+        secure （布尔值）：指定是否仅通过HTTPS发送cookie。
+        httponly （布尔值）：指定JavaScript是否无法读取cookie。
+
+</textarea>
+
+
+<textarea>
+
+Sanic的API文档管理：
+    Swagger 是一个规范和完整的框架，用于生成、描述、调用和可视化 RESTful风格的Web服务。
+    swagger工具 swagger UI:无依赖的HTML、JS和CSS的应用，根据swagger的json文件自动生成api文档和沙箱测试。
+    sanic_openapi库支持sanic产生API文档，使用步骤如下：
+    1.安装： pip install sanic_openapi
+    2.导入：
+        from sanic_openapi import doc
+        from sanic_openapi import swagger_blueprint
+    3.添加API描述：在视图函数上使用 @doc.summary() 添加API描述，其它属性有 tag-分组, consumes 等
+    4.文档路由注册：
+        sanic_app.config.API_TITLE = "XXX平台API文档"  # API 文档名称
+        sanic_app.blueprint(swagger_blueprint)
+    5.启动与访问：启动服务后，访问swagger网址：http://127.0.0.1:8000/swagger/即可浏览API文档
+
+</textarea>
+
+<textarea>
+
+Sanic路由：路由路径开头可不加斜杠/，会自动补充；根据访问匹配模式，路由可分为唯一路由和非唯一路由，
+    唯一url: 即严格匹配路由定义,末尾有无斜杠/将影响访问,
+    非唯一url：末尾有无斜杠/都可访问
+    若需要将所有的URL都设置成为唯一URL,可以这样: app = Sanic(strict_slashes=True)
+
+sanic的路由声明方式有:
+1. @sanic_app.route()(常用)，methods的方法名不分大小写，不指定此字段则默认为GET请求
+    @sanic_app.route("sanic_test", methods=["get", "post"])
+2. 直接用sanic_app.add_route()方法，这种方法跟用@sanic_app.route()效果一样,因为route()方法只是add_route()的一个包装器
+    sanic_app.add_route(sanic_test, uri="/test_sanic", name="test_sanic", methods=["post", "get"])
+3. @sanic_app.post()，使用已封装好的具体的HTTP请求方法，如get, post, put, patch, delete等
+    @sanic_app.post("/record_log/")
+4. 使用类视图(推荐)，from sanic.views import HTTPMethodView
+    class HomePage(HTTPMethodView):
+        """类视图"""
+
+        async def get(self, request):
+            return response.json({"status": "success", "msg": "你好: class view for get request"})
+
+        async def post(self, request):
+
+            return response.json({"status": "success", "msg": "你好: class view for post request"})
+
+5. 动态添加路由：用CompositionView 可以实现动态路由添加
+    from sanic.views import CompositionView
+    async def post_handler(request):
+        print(request.json)
+        return response.text('这是动态路由响应结果')
+
+    view = CompositionView()
+    view.add(["POST"], post_handler)
+    sanic_app.add_route(view, "/post_info")
+
+6. 静态文件url: 一般用于返回静态HTML页面
+    sanic_app.static("/static", "./static/home.html")
+
+</textarea>
+
+
+<textarea>
+sanic服务的启动方式有:
+    1.在py脚本中调用 sanic_app.run()方法,再运行该py脚本,若用其它方式就无需在py中调用sanic_app.run()方法了
+    2.用命令行运行: python -m sanic anic_test.sanic_app --host=0.0.0.0 --port=8005 --workers=4
+    3.直接用Gunicorn服务器运行: gunicorn sanic_test:sanic_app --bind 0.0.0.0:8005 --worker-class sanic.worker.GunicornWorker
+    4.用supervisor运行gunicorn脚本: supervisor.ini
+
+Sanic的调试：
+    当启用SANIC的调试模式时，SANIC将提供更详细的日志记录输出，默认情况下将启用自动重新加载功能。
+    设置调试模式：通过设置 debug 模式将输出Sanic更详细的输出，并激活自动重新加载程序。提供debug级别的日志。
+    设置方法： 启动方法 sanic_app.run()中添加属性 debug=True
+    手动设置自动重新加载：SANIC提供了一种手动启用或禁用自动重新加载的方法，即 auto_reload 参数将激活或停用自动重新加载。
+
+sanic_app.run()参数有:
+    host：主机服务器的地址，默认为127.0.0.1
+    port：启动服务器的断开，默认为8000
+    debug：启用调试输出，默认为False
+    ssl：SSLContext用于工作人员的ssl加密，默认为None
+    sock：服务器接受连接的套接字，默认为None
+    wrokers：产生工作进程的数量，默认为1
+    loop：一个asyncio兼容的循环事件。如果没有指定，Sanic创建它自己的事情循环，默认为None
+    protocol：asyncio.protocol的子类，默认为HttpProtocol
+
+</textarea>
+
+<textarea>
+Sanic中跨域问题解决方案：
+    在sanic框架中可以用 sanic_cors 库来解决跨域问题，使用步骤如下：
+    安装：pip install sanic-cors
+    导入：from sanic_cors import CORS
+    应用：CORS(sanic_app)
+</textarea>
+
+<textarea>
+相关类库介绍：
+    nameko 是python中一款小巧、简洁的、异步通信方式的微服务架构，通过rabbitmq消息组件来实现RPC服务。
+    nameko 官方文档：https://nameko.readthedocs.io/en/stable
+    nameko github 地址：https://github.com/nameko/nameko
+
+    Locust 是性能测试工具，默认只支持http协议，即默认只有http的client，
+    需要其他协议的测试必须自己扩展对应的client。可以通过自定义重构部分代码，以支持压测websocket。
+</textarea>
+
+<textarea>
+Sanic项目部署：
+    项目开发完成后，需要部署到服务器上运行，部署方式通常有：
+    1. 容器化部署：一般是用dockers容器引擎，
+    2. 物理机部署：
+</textarea>
+
+</div>
+
+</body>
+<footer>
+    <div>
+        this is footer
+    </div>
+</footer>
+</html>

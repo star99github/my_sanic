@@ -1,11 +1,13 @@
+import json
 import os
 from sanic import Request, response, Sanic, redirect
 from sanic.views import HTTPMethodView
+from sanic_cors import CORS
 import sqlalchemy
 
 
 sanic_app = Sanic("my_sanic")
-
+CORS(sanic_app)
 
 # =====> sanic声明接口的方式一：@sanic_app.route()(常用)，路由路径开头可不加斜杠/，会自动补充；methods的方法名不分大小写，不指定此字段则默认为GET请求
 @sanic_app.route("sanic_test", methods=["get", "post"])
@@ -19,13 +21,18 @@ sanic_app.add_route(sanic_test, uri="/test_sanic", name="test_sanic", methods=["
 
 
 # =====> sanic声明接口的方式三：@sanic_app.post()，使用已封装好的具体的HTTP请求方法
-@sanic_app.post("/record_log/")
+@sanic_app.route("/record_log", methods=["post", "get"])
 async def write_file(request):
-    print("start write log file")
+    file_content = request.json.get("file_content")
+    print(f"-----> start write log file: {file_content}")
+    res = {"status": "failed", "detail": "write log file failed"}
     logs_file = os.path.join(os.path.dirname(__file__), "logs/sanic_log.log")
     with open(logs_file, "wb") as f:
-        f.write("sanic写入一些内容".encode())
-    return response.text("write log file success")
+        f.write(f"sanic写入一些内容: {file_content}".encode())
+        res["status"] = "success"
+        res["detail"] = "write log file success"
+    return response.json(body=res)
+    # return response.text(json.dumps(res))
 
 
 # =====> sanic声明接口的方式四：使用类视图(推荐)，from sanic.views import HTTPMethodView
@@ -58,7 +65,7 @@ sanic_app.add_route(HomePage.as_view(), uri="/homepage/", name="homepage")
 # 路由的名称为程序处理方法名称，即函数.__name__生成的，用于传递一个name参数到装饰器中来修改它的名称
 # url_for使用注意：第一个参数为重定向URL的路由名称(默认为函数名称)，并非URL名称。重定向时可将请求参数指派到url_for方法中
 # 示例中重定向后的路径为: /homepage/to_home/
-@sanic_app.route("/before_redirect_url/")
+@sanic_app.get("/before_redirect_url/")
 async def test_redirect(request):
     print(f"的原始请求body: {request.json}")
     url = sanic_app.url_for("homepage", name="to_home", _method="post")
@@ -71,12 +78,11 @@ async def test_redirect(request):
 # 若需要将所有的URL都设置成为唯一URL,可以这样: app = Sanic(strict_slashes=True)
 
 # ====> 静态文件url: 一般用于返回静态HTML页面
-sanic_app.static("/static", "./static/home.html")
+sanic_app.static("/static", "./templates/html/my_home.html")
 
 
 if __name__ == "__main__":
     print("-----> my_sanic 服务开始启动")
     sanic_app.run(host="0.0.0.0", port=8005, workers=2, debug=True, auto_reload=True)
 
-    print("-----> my_sanic 服务运行完成")
     print("-----> my_sanic 服务运行完成")

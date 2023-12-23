@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Star应用管理平台</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../img/site_img.ico" />
+    <link rel="stylesheet" type="text/css" href="../css/my_home.css">
+
+    <script type="text/javascript" src="../lib/vue.global.js"></script>
+    <script type="text/javascript" src="../js/my_home.js" async></script>
+
+</head>
+
+<style type="text/css">
+    * {color: red}
+
+</style>
+
+<body>
+    <img src="../img/bj40_2.jpg">
+    <div id="header">
+        <p>这是头部区块</p>
+		<p>{{ msg }}</p>
+	</div>
+
+    <br>
+    <div id="content">
+        <p>这是内容区块</p>
+		<p>{{ msg }}</p>
+        <form id="file_content">
+            <input id="u_content" name="file_content" >
+            <button name="ok" type="submit">确定</button>
+            <input id="u_res" name="u_res" readonly>
+            <p>{{ data }}</p>
+        </form>
+	</div>
+
+    <br>
+    <div id="footer">
+        <p>这是底部区块</p>
+        <p v-if="showMessage === 1">Hello Vue! {{ detail }}</p>
+        <p v-else-if="showMessage === 2">runnint Vue! {{ detail }}</p>
+        <p v-else>Goodbye Vue! {{ detail }}</p>
+    </div>
+</body>
+
+</body>
+</html>

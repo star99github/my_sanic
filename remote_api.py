@@ -59,10 +59,6 @@ async def screenshot(request):
 async def record_screen(request):
     """
     实现录屏
-    Python开发需要用到 Camera 或者 视频设备时，可以使用OpenCV来创建视频文件，
-    创建视频文件的类是VideoWriter。OpenCV 底层是用 FFMEPG 进行多媒体开发的。
-    pip install opencv-python
-    import cv2
     """
     log.info("IP: {} 进行录像".format(request.ip))
 
@@ -83,7 +79,6 @@ async def record_screen(request):
         if video_out is None or time.time() - time_now > video_time:
             if video_out:
                 video_out.release()
-                video_out = None
             time_str = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
             video_path = os.path.join('./tempdir/capture/') + time_str + '.avi'
             video_out = cv2.VideoWriter(video_path, fourcc, 30.0, (640, 480))
